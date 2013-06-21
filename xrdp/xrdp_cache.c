@@ -1,7 +1,7 @@
 /**
  * xrdp: A Remote Desktop Protocol server.
  *
- * Copyright (C) Jay Sorg 2004-2012
+ * Copyright (C) Jay Sorg 2004-2013
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -475,9 +475,10 @@ xrdp_cache_add_pointer(struct xrdp_cache *self,
         if (self->pointer_items[i].x == pointer_item->x &&
                 self->pointer_items[i].y == pointer_item->y &&
                 g_memcmp(self->pointer_items[i].data,
-                         pointer_item->data, 32 * 32 * 3) == 0 &&
+                         pointer_item->data, 32 * 32 * 4) == 0 &&
                 g_memcmp(self->pointer_items[i].mask,
-                         pointer_item->mask, 32 * 32 / 8) == 0)
+                         pointer_item->mask, 32 * 32 / 8) == 0 &&
+                self->pointer_items[i].bpp == pointer_item->bpp)
         {
             self->pointer_items[i].stamp = self->pointer_stamp;
             xrdp_wm_set_pointer(self->wm, i);
@@ -503,15 +504,17 @@ xrdp_cache_add_pointer(struct xrdp_cache *self,
     self->pointer_items[index].x = pointer_item->x;
     self->pointer_items[index].y = pointer_item->y;
     g_memcpy(self->pointer_items[index].data,
-             pointer_item->data, 32 * 32 * 3);
+             pointer_item->data, 32 * 32 * 4);
     g_memcpy(self->pointer_items[index].mask,
              pointer_item->mask, 32 * 32 / 8);
     self->pointer_items[index].stamp = self->pointer_stamp;
+    self->pointer_items[index].bpp = pointer_item->bpp;
     xrdp_wm_send_pointer(self->wm, index,
                          self->pointer_items[index].data,
                          self->pointer_items[index].mask,
                          self->pointer_items[index].x,
-                         self->pointer_items[index].y);
+                         self->pointer_items[index].y,
+                         self->pointer_items[index].bpp);
     self->wm->current_pointer = index;
     DEBUG(("adding pointer at %d", index));
     return index;
@@ -533,15 +536,17 @@ xrdp_cache_add_pointer_static(struct xrdp_cache *self,
     self->pointer_items[index].x = pointer_item->x;
     self->pointer_items[index].y = pointer_item->y;
     g_memcpy(self->pointer_items[index].data,
-             pointer_item->data, 32 * 32 * 3);
+             pointer_item->data, 32 * 32 * 4);
     g_memcpy(self->pointer_items[index].mask,
              pointer_item->mask, 32 * 32 / 8);
     self->pointer_items[index].stamp = self->pointer_stamp;
+    self->pointer_items[index].bpp = pointer_item->bpp;
     xrdp_wm_send_pointer(self->wm, index,
                          self->pointer_items[index].data,
                          self->pointer_items[index].mask,
                          self->pointer_items[index].x,
-                         self->pointer_items[index].y);
+                         self->pointer_items[index].y,
+                         self->pointer_items[index].bpp);
     self->wm->current_pointer = index;
     DEBUG(("adding pointer at %d", index));
     return index;

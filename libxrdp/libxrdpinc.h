@@ -1,7 +1,7 @@
 /**
  * xrdp: A Remote Desktop Protocol server.
  *
- * Copyright (C) Jay Sorg 2004-2010
+ * Copyright (C) Jay Sorg 2004-2013
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ libxrdp_send_bitmap(struct xrdp_session* session, int width, int height,
                     int bpp, char* data, int x, int y, int cx, int cy);
 int DEFAULT_CC
 libxrdp_send_pointer(struct xrdp_session* session, int cache_idx,
-                     char* data, char* mask, int x, int y);
+                     char* data, char* mask, int x, int y, int bpp);
 int DEFAULT_CC
 libxrdp_set_pointer(struct xrdp_session* session, int cache_idx);
 int DEFAULT_CC

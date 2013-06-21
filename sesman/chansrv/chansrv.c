@@ -1,7 +1,7 @@
 /**
  * xrdp: A Remote Desktop Protocol server.
  *
- * Copyright (C) Jay Sorg 2009-2012
+ * Copyright (C) Jay Sorg 2009-2013
  * Copyright (C) Laxmikant Rashinkar 2009-2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +45,7 @@ static int g_rdpsnd_index = -1;
 static int g_rdpdr_index = -1;
 static int g_rail_index = -1;
 static int g_drdynvc_index = -1;
+static int g_sent = 0; /* if sent data to xrdp, waiting response */
 
 /* state info for dynamic virtual channels */
 static struct xrdp_api_data *g_dvc_channels[MAX_DVC_CHANNELS];
@@ -149,6 +150,7 @@ send_data_from_chan_item(struct chan_item *chan_item)
     s_mark_end(s);
     LOGM((LOG_LEVEL_DEBUG, "chansrv::send_channel_data: -- "
           "size %d chan_flags 0x%8.8x", size, chan_flags));
+    g_sent = 1;
     error = trans_force_write(g_con_trans);
 
     if (error != 0)
@@ -214,7 +216,10 @@ send_channel_data(int chan_id, char *data, int size)
         if (g_chan_items[index].id == chan_id)
         {
             add_data_to_chan_item(g_chan_items + index, data, size);
-            check_chan_items();
+            if (g_sent == 0)
+            {
+                check_chan_items();
+            }
             return 0;
         }
     }
@@ -376,7 +381,7 @@ process_message_channel_setup(struct stream *s)
     if (g_cliprdr_index >= 0)
     {
         clipboard_init();
-        fuse_init();
+        xfuse_init();
     }
 
     if (g_rdpsnd_index >= 0)
@@ -387,6 +392,7 @@ process_message_channel_setup(struct stream *s)
     if (g_rdpdr_index >= 0)
     {
         dev_redir_init();
+        xfuse_init();
     }
 
     if (g_rail_index >= 0)
@@ -477,6 +483,7 @@ static int APP_CC
 process_message_channel_data_response(struct stream *s)
 {
     LOG(10, ("process_message_channel_data_response:"));
+    g_sent = 0;
     check_chan_items();
     return 0;
 }
@@ -953,7 +960,7 @@ channel_thread_loop(void *in_val)
             xcommon_check_wait_objs();
             sound_check_wait_objs();
             dev_redir_check_wait_objs();
-            fuse_check_wait_objs();
+            xfuse_check_wait_objs();
             timeout = -1;
             num_objs = 0;
             objs[num_objs] = g_term_event;
@@ -965,8 +972,8 @@ channel_thread_loop(void *in_val)
             xcommon_get_wait_objs(objs, &num_objs, &timeout);
             sound_get_wait_objs(objs, &num_objs, &timeout);
             dev_redir_get_wait_objs(objs, &num_objs, &timeout);
-            fuse_get_wait_objs(objs, &num_objs, &timeout);
-        }
+            xfuse_get_wait_objs(objs, &num_objs, &timeout);
+        } /* end while (g_obj_wait(objs, num_objs, 0, 0, timeout) == 0) */
     }
 
     trans_delete(g_lis_trans);

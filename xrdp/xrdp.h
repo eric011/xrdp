@@ -1,7 +1,7 @@
 /**
  * xrdp: A Remote Desktop Protocol server.
  *
- * Copyright (C) Jay Sorg 2004-2012
+ * Copyright (C) Jay Sorg 2004-2013
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,9 +126,10 @@ int APP_CC
 xrdp_wm_pu(struct xrdp_wm* self, struct xrdp_bitmap* control);
 int APP_CC
 xrdp_wm_send_pointer(struct xrdp_wm* self, int cache_idx,
-                     char* data, char* mask, int x, int y);
+                     char* data, char* mask, int x, int y, int bpp);
 int APP_CC
-xrdp_wm_pointer(struct xrdp_wm* self, char* data, char* mask, int x, int y);
+xrdp_wm_pointer(struct xrdp_wm* self, char* data, char* mask, int x, int y,
+                int bpp);
 int
 callback(long id, int msg, long param1, long param2, long param3, long param4);
 int APP_CC
@@ -375,6 +376,9 @@ server_paint_rect(struct xrdp_mod* mod, int x, int y, int cx, int cy,
 int DEFAULT_CC
 server_set_pointer(struct xrdp_mod* mod, int x, int y,
                    char* data, char* mask);
+int DEFAULT_CC
+server_set_pointer_ex(struct xrdp_mod* mod, int x, int y,
+                      char* data, char* mask, int bpp);
 int DEFAULT_CC
 server_palette(struct xrdp_mod* mod, int* palette);
 int DEFAULT_CC

@@ -3,7 +3,7 @@
  * Miscellaneous protocol constants
  *
  * Copyright (C) Matthew Chapman 1999-2008
- * Copyright (C) Jay Sorg 2004-2012
+ * Copyright (C) Jay Sorg 2004-2013
  * Copyright (C) Kevin Zhou 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -126,6 +126,7 @@
 #define RDP_POINTER_MOVE               3
 #define RDP_POINTER_COLOR              6
 #define RDP_POINTER_CACHED             7
+#define RDP_POINTER_POINTER            8
 
 #define RDP_NULL_POINTER               0
 #define RDP_DEFAULT_POINTER            0x7F00

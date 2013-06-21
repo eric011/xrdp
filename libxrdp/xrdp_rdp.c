@@ -1,7 +1,7 @@
 /**
  * xrdp: A Remote Desktop Protocol server.
  *
- * Copyright (C) Jay Sorg 2004-2012
+ * Copyright (C) Jay Sorg 2004-2013
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,10 @@ xrdp_rdp_read_config(struct xrdp_client_info *client_info)
         else if (g_strcasecmp(item, "max_bpp") == 0)
         {
             client_info->max_bpp = g_atoi(value);
+        }
+        else if (g_strcasecmp(item, "new_cursors") == 0)
+        {
+            client_info->pointer_flags = text2bool(value) == 0 ? 2 : 0;
         }
     }
 
@@ -829,6 +833,7 @@ xrdp_process_capset_order(struct xrdp_rdp *self, struct stream *s,
     int i;
     char order_caps[32];
     int ex_flags;
+    int cap_flags;
 
     DEBUG(("order capabilities"));
     in_uint8s(s, 20); /* Terminal desc, pad */
@@ -837,8 +842,9 @@ xrdp_process_capset_order(struct xrdp_rdp *self, struct stream *s,
     in_uint8s(s, 2); /* Pad */
     in_uint8s(s, 2); /* Max order level */
     in_uint8s(s, 2); /* Number of fonts */
-    in_uint8s(s, 2); /* Capability flags */
+    in_uint16_le(s, cap_flags); /* Capability flags */
     in_uint8a(s, order_caps, 32); /* Orders supported */
+    g_memcpy(self->client_info.orders, order_caps, 32);
     DEBUG(("dest blt-0 %d", order_caps[0]));
     DEBUG(("pat blt-1 %d", order_caps[1]));
     DEBUG(("screen blt-2 %d", order_caps[2]));
@@ -862,12 +868,15 @@ xrdp_process_capset_order(struct xrdp_rdp *self, struct stream *s,
     /* read extended order support flags */
     in_uint16_le(s, ex_flags); /* Ex flags */
 
-    if (ex_flags & XR_ORDERFLAGS_EX_CACHE_BITMAP_REV3_SUPPORT)
+    if (cap_flags & 0x80) /* ORDER_FLAGS_EXTRA_SUPPORT */
     {
-        g_writeln("xrdp_process_capset_order: bitmap cache v3 supported");
-        self->client_info.bitmap_cache_version |= 4;
+        self->client_info.order_flags_ex = ex_flags;
+        if (ex_flags & XR_ORDERFLAGS_EX_CACHE_BITMAP_REV3_SUPPORT)
+        {
+            g_writeln("xrdp_process_capset_order: bitmap cache v3 supported");
+            self->client_info.bitmap_cache_version |= 4;
+        }
     }
-
     in_uint8s(s, 4); /* Pad */
 
     in_uint32_le(s, i); /* desktop cache size, usually 0x38400 */
@@ -958,11 +967,34 @@ xrdp_process_capset_pointercache(struct xrdp_rdp *self, struct stream *s,
                                  int len)
 {
     int i;
+    int colorPointerFlag;
+    int no_new_cursor;
 
-    in_uint8s(s, 2); /* color pointer */
+    no_new_cursor = self->client_info.pointer_flags & 2;
+    in_uint16_le(s, colorPointerFlag);
+    self->client_info.pointer_flags = colorPointerFlag;
     in_uint16_le(s, i);
     i = MIN(i, 32);
     self->client_info.pointer_cache_entries = i;
+    if (colorPointerFlag & 1)
+    {
+        g_writeln("xrdp_process_capset_pointercache: client supports "
+                  "new(color) cursor");
+        in_uint16_le(s, i);
+        i = MIN(i, 32);
+        self->client_info.pointer_cache_entries = i;
+    }
+    else
+    {
+        g_writeln("xrdp_process_capset_pointercache: client does not support "
+                  "new(color) cursor");
+    }
+    if (no_new_cursor)
+    {
+        g_writeln("xrdp_process_capset_pointercache: new(color) cursor is "
+                  "disabled by config");
+        self->client_info.pointer_flags = 0;
+    }
     return 0;
 }
 
