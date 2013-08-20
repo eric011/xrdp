@@ -38,9 +38,9 @@ INCLUDES = \
   $(EXTRA_INCLUDES)
 
 lib_LTLIBRARIES = \
-  libxrdp.la
+  librdpp.la
 
-libxrdp_la_SOURCES = \
+librdpp_la_SOURCES = \
   libxrdp.c \
   xrdp_channel.c \
   xrdp_iso.c \
@@ -54,9 +54,9 @@ libxrdp_la_SOURCES = \
   xrdp_orders_rail.c \
   xrdp_mppc_enc.c
 
-libxrdp_la_LDFLAGS = \
+librdpp_la_LDFLAGS = \
   $(EXTRA_FLAGS)
 
-libxrdp_la_LIBADD = \
+librdpp_la_LIBADD = \
   $(top_builddir)/common/libcommon.la \
   $(EXTRA_LIBS)

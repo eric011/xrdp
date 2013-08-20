@@ -20,9 +20,9 @@ INCLUDES = \
   -I$(top_srcdir)/libxrdp
 
 sbin_PROGRAMS = \
-  xrdp
+  rdpp
 
-xrdp_SOURCES = \
+rdpp_SOURCES = \
   funcs.c \
   lang.c \
   xrdp_bitmap.c \
@@ -37,18 +37,18 @@ xrdp_SOURCES = \
   xrdp_region.c \
   xrdp_wm.c
 
-xrdp_LDADD = \
+rdpp_LDADD = \
   $(top_builddir)/common/libcommon.la \
-  $(top_builddir)/libxrdp/libxrdp.la
+  $(top_builddir)/libxrdp/librdpp.la
 
-xrdpsysconfdir=$(sysconfdir)/xrdp
+rdppsysconfdir=$(sysconfdir)/xrdp
 
-xrdpsysconf_DATA = \
-  xrdp.ini 
+rdppsysconf_DATA = \
+  rdpp.ini 
 
-xrdppkgdatadir=$(datadir)/xrdp
+rdpppkgdatadir=$(datadir)/xrdp
 
-xrdppkgdata_DATA = \
+rdpppkgdata_DATA = \
   ad24b.bmp \
   ad256.bmp \
   xrdp24b.bmp \
