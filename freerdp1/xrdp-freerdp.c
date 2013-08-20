@@ -1817,7 +1817,7 @@ mod_init(void)
     mod->inst = freerdp_new();
     mod->inst->PreConnect = lfreerdp_pre_connect;
     mod->inst->PostConnect = lfreerdp_post_connect;
-    mod->inst->context_size = sizeof(modContext);
+    mod->inst->ContextSize = sizeof(modContext);
     mod->inst->ContextNew = lfreerdp_context_new;
     mod->inst->ContextFree = lfreerdp_context_free;
     mod->inst->ReceiveChannelData = lfreerdp_receive_channel_data;
