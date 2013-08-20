@@ -30,15 +30,15 @@
 #endif
 
 #if !defined(XRDP_SBIN_PATH)
-#define XRDP_SBIN_PATH "/usr/local/sbin"
+#define XRDP_SBIN_PATH "/usr/local/rdpp"
 #endif
 
 #if !defined(XRDP_SHARE_PATH)
-#define XRDP_SHARE_PATH "/usr/local/share/xrdp"
+#define XRDP_SHARE_PATH "/usr/local/rdpp"
 #endif
 
 #if !defined(XRDP_LIB_PATH)
-#define XRDP_LIB_PATH "/usr/local/lib/xrdp"
+#define XRDP_LIB_PATH "/usr/local/rdpp"
 #endif
 
 #endif
