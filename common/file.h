@@ -34,4 +34,10 @@ int APP_CC
 file_by_name_read_section(const char* file_name, const char* section,
                           struct list* names, struct list* values);
 
+const char*
+get_base_filename();
+
+int
+set_base_filename(const char* name);
+
 #endif

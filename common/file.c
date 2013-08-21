@@ -24,6 +24,22 @@
 #include "file.h"
 #include "parse.h"
 
+static char g_base_filename[256] = {0};
+
+
+const char*
+get_base_filename() 
+{
+    return g_base_filename;
+}
+
+int
+set_base_filename(const char* name)
+{
+    g_strncpy(g_base_filename, name, 255);
+    return 0;
+}
+
 /*****************************************************************************/
 /* returns error
    returns 0 if everything is ok
