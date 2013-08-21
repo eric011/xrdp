@@ -74,14 +74,7 @@ lxrdp_start(struct mod *mod, int w, int h, int bpp)
     settings->RdpSecurity = 1;
 
     // remote app
-    settings->RemoteApplicationMode=TRUE;
-    settings->RemoteApplicationName=strdup("calculator");
-    settings->RemoteApplicationProgram=strdup("||calc");
-    settings->RemoteAppLanguageBarSupported=FALSE;
-    settings->Workarea=TRUE;
-    settings->DisableWallpaper=TRUE;
-    settings->DisableFullWindowDrag=TRUE;
-
+    settings->RemoteApplicationMode=FALSE;
 
     return 0;
 }

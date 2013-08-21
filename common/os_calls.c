@@ -2383,7 +2383,12 @@ g_load_library(char *in)
 #if defined(_WIN32)
     return (long)LoadLibraryA(in);
 #else
-    return (long)dlopen(in, RTLD_LOCAL | RTLD_LAZY);
+    char* handle = dlopen(in, RTLD_LOCAL | RTLD_LAZY);
+    if (NULL == handle) {
+        g_writeln("load library %s failed: %s", in, dlerror());
+    }
+    return (long) handle;
+
 #endif
 }
 
