@@ -277,6 +277,21 @@ xrdp_process_params(int argc, char **argv,
             startup_params->fork = 1;
             g_writeln("--fork parameter found, ini override");
         }
+        else if ((g_strncasecmp(option, "-b", 255) == 0) ||
+                 (g_strncasecmp(option, "--basename", 255) == 0))
+        {
+            char base_filename[256] = {0};
+            index++;
+            g_strncpy(base_filename, value, 127);
+
+            if (g_strlen(base_filename) < 1)
+            {
+                g_writeln("error processing params, basename [%s]", base_filename);
+                return 1;
+            } else {
+                set_base_filename(base_filename);
+            }
+        }
         else
         {
             return 1;
@@ -351,7 +366,19 @@ main(int argc, char **argv)
         return 0;
     }
 
-    g_snprintf(cfg_file, 255, "%s/xrdp.ini", XRDP_CFG_PATH);
+    startup_params = (struct xrdp_startup_params *)
+                     g_malloc(sizeof(struct xrdp_startup_params), 1);
+
+    if (xrdp_process_params(argc, argv, startup_params) != 0)
+    {
+        g_writeln("Unknown Parameter");
+        g_writeln("xrdp -h for help");
+        g_writeln("");
+        g_deinit();
+        g_exit(0);
+    }
+
+    g_snprintf(cfg_file, 255, "%s/%s.ini", XRDP_CFG_PATH, get_base_filename());
 
     /* starting logging subsystem */
     error = log_start(cfg_file, "XRDP");
@@ -376,19 +403,7 @@ main(int argc, char **argv)
         g_exit(1);
     }
 
-    startup_params = (struct xrdp_startup_params *)
-                     g_malloc(sizeof(struct xrdp_startup_params), 1);
-
-    if (xrdp_process_params(argc, argv, startup_params) != 0)
-    {
-        g_writeln("Unknown Parameter");
-        g_writeln("xrdp -h for help");
-        g_writeln("");
-        g_deinit();
-        g_exit(0);
-    }
-
-    g_snprintf(pid_file, 255, "%s/xrdp.pid", XRDP_PID_PATH);
+    g_snprintf(pid_file, 255, "%s/%s.pid", XRDP_PID_PATH, get_base_filename());
     no_daemon = 0;
 
     if (startup_params->kill)

@@ -380,7 +380,7 @@ xrdp_wm_load_static_colors_plus(struct xrdp_wm *self, char *autorun_name)
     self->background = HCOLOR(self->screen->bpp, 0x000000);
 
     /* now load them from the globals in xrdp.ini if defined */
-    g_snprintf(cfg_file, 255, "%s/xrdp.ini", XRDP_CFG_PATH);
+    g_snprintf(cfg_file, 255, "%s/%s.ini", XRDP_CFG_PATH, get_base_filename());
     fd = g_file_open(cfg_file);
 
     if (fd > 0)
@@ -541,7 +541,7 @@ xrdp_wm_init(struct xrdp_wm *self)
 
     if (self->session->client_info->rdp_autologin || (autorun_name[0] != 0))
     {
-        g_snprintf(cfg_file, 255, "%s/xrdp.ini", XRDP_CFG_PATH);
+        g_snprintf(cfg_file, 255, "%s/%s.ini", XRDP_CFG_PATH, get_base_filename());
         fd = g_file_open(cfg_file); /* xrdp.ini */
 
         if (fd > 0)

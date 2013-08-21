@@ -2114,7 +2114,7 @@ int read_allowed_channel_names(struct list *names, struct list *values)
     int ret = 0;
     char cfg_file[256];
     int pos;
-    g_snprintf(cfg_file, 255, "%s/xrdp.ini", XRDP_CFG_PATH);
+    g_snprintf(cfg_file, 255, "%s/%s.ini", XRDP_CFG_PATH, get_base_filename());
     fd = g_file_open(cfg_file);
 
     if (fd > 0)
