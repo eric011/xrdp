@@ -54,6 +54,14 @@ void verifyColorMap(struct mod *mod)
     }
     LLOGLN(0, ("The colormap is all NULL\n"));
 }
+
+static void
+freerdp_UnicodeToAsciiAlloc(const char* src, char** dest, int len)
+{
+    *dest = g_malloc(len, 1);
+    memcpy(*dest, src, len);
+}
+
 /*****************************************************************************/
 /* return error */
 static int DEFAULT_CC
