@@ -2302,7 +2302,7 @@ xrdp_orders_send_bitmap3(struct xrdp_orders *self,
     struct stream *temp_s; /* xrdp stream */
     struct xrdp_client_info *ci;
 #if defined(XRDP_FREERDP1)
-    STREAM *fr_s; /* FreeRDP stream */
+    wStream *fr_s; /* FreeRDP stream */
     RFX_CONTEXT *context;
     RFX_RECT rect;
 #endif
@@ -2325,22 +2325,16 @@ xrdp_orders_send_bitmap3(struct xrdp_orders *self,
 
         LLOGLN(10, ("xrdp_orders_send_bitmap3: rfx"));
         context = (RFX_CONTEXT *)(self->rdp_layer->rfx_enc);
-        make_stream(xr_s);
-        init_stream(xr_s, 16384);
-        fr_s = stream_new(0);
-        stream_attach(fr_s, (tui8 *)(xr_s->data), 16384);
+        fr_s = Stream_New(0, 16384);
         rect.x = 0;
         rect.y = 0;
         rect.width = width;
         rect.height = height;
         rfx_compose_message(context, fr_s, &rect, 1, (tui8 *)data, width,
                             height, width * 4);
-        bufsize = stream_get_length(fr_s);
-        xrdp_orders_out_v3(self, cache_id, cache_idx, (char *)(fr_s->data), bufsize,
+        xrdp_orders_out_v3(self, cache_id, cache_idx, Stream_Buffer(fr_s), Stream_Length(fr_s),
                            width, height, bpp, ci->v3_codec_id);
-        stream_detach(fr_s);
-        stream_free(fr_s);
-        free_stream(xr_s);
+        Stream_Free(fr_s, TRUE);
         return 0;
 #else
         return 2;
