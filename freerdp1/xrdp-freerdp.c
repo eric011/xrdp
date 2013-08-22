@@ -513,6 +513,7 @@ lfreerdp_begin_paint(rdpContext *context)
     LLOGLN(10, ("lfreerdp_begin_paint:"));
     mod = ((struct mod_context *)context)->modi;
     mod->server_begin_update(mod);
+    // verifyColorMap(mod);
 }
 
 /******************************************************************************/
@@ -524,6 +525,22 @@ lfreerdp_end_paint(rdpContext *context)
     LLOGLN(10, ("lfreerdp_end_paint:"));
     mod = ((struct mod_context *)context)->modi;
     mod->server_end_update(mod);
+}
+
+/******************************************************************************/
+static void DEFAULT_CC
+lfreerdp_update_palette(rdpContext *context, PALETTE_UPDATE* palette)
+{
+    int i;
+    struct mod *mod = ((struct mod_context *)context)->modi;
+
+    memset(mod->colormap, 0, sizeof(mod->colormap));
+    for (i = 0; i < palette->number; i++)
+    {
+        mod->colormap[i] = COLOR24BGR(palette->entries[i].red,
+                                   palette->entries[i].green,
+                                   palette->entries[i].blue);
+    }
 }
 
 /******************************************************************************/
@@ -665,6 +682,7 @@ lfreerdp_pat_blt(rdpContext *context, PATBLT_ORDER *patblt)
     if(fgcolor==bgcolor)
     {
         LLOGLN(0, ("Warning same color on both bg and fg"));
+    } else {
     }
     mod->server_set_mixmode(mod, 1);
     mod->server_set_opcode(mod, patblt->bRop);
@@ -1316,7 +1334,6 @@ lfreerdp_pre_connect(freerdp *instance)
 
     LLOGLN(0, ("lfreerdp_pre_connect:"));
     mod = ((struct mod_context *)(instance->context))->modi;
-    verifyColorMap(mod);
     num_chans = 0;
     index = 0;
     error = mod->server_query_channel(mod, index, ch_name, &ch_flags);
@@ -1398,6 +1415,7 @@ lfreerdp_pre_connect(freerdp *instance)
 
     instance->update->BeginPaint = lfreerdp_begin_paint;
     instance->update->EndPaint = lfreerdp_end_paint;
+    instance->update->Palette  = lfreerdp_update_palette;
     instance->update->SetBounds = lfreerdp_set_bounds;
     instance->update->BitmapUpdate = lfreerdp_bitmap_update;
     instance->update->Synchronize = lfreerdp_syncronize ;
